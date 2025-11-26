@@ -1,0 +1,27 @@
+name: Check Data Update
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  check-data-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Use nightly toolchain
+        run: rustup update nightly && rustup default nightly
+
+      - name: Run data update
+        id: data_update
+        run: cargo run -p raphael-date-updater
+
+      - name: Commit and push changes if any
+        uses: EndBug/add-and-commit@v9
+        with:
+          default_author: github_actions
+          message: "Auto update data files"
